@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "declaration": true,
+      "target": "es2018",
+      "module": "commonjs",
+      "removeComments": false,
+      "sourceMap": true,
+      "noUnusedParameters": false,
+      "strict": true,
+      "typeRoots": ["./node_modules/@types", "./types"],
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "types": ["node", "mocha"],
+      "outDir": "./build",
+      "rootDir": "./src"
+    },
+  
+    "exclude": [
+      "node_modules", "build", "test"
+    ]
+  }
+  
