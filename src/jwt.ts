@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 
-export function signToken() : string {
+export function signToken(user : string) : string {
   // loading private key
   const privateKey = 'myPrivateKey';
   // JWT header
@@ -9,7 +9,6 @@ export function signToken() : string {
     alg: 'HS256',
   };
   // JWT payload
-  const user = 'john doe';
   const payload = {
     sub: user,
     exp: Math.floor(Date.now() / 1000) + (60 * 60),

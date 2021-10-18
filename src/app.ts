@@ -65,8 +65,9 @@ app.post('/users', (req: Request, res: Response) => {
 
 app.get('/token', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
   // returns a token
+  const email = req.get('Authorization')?.split(' ')[1].split(':')[0];
   try {
-    const webToken = signToken();
+    const webToken = signToken(email as string);
     res.send(webToken); res.status(200);
   } catch {
     res.send(500);
