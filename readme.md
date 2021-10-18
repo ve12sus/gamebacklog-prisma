@@ -34,11 +34,6 @@
 
 The REST API to the example app is described below.
 
-## Get a list of users
-
-### Request
-
-
 ## Create a user
 
 ### Request
