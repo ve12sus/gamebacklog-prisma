@@ -34,6 +34,11 @@
 
 The REST API to the example app is described below.
 
+## Get a list of users
+
+### Request
+
+
 ## Create a user
 
 ### Request
@@ -51,6 +56,43 @@ The REST API to the example app is described below.
     Content-Length: 57
 
     [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
+
+`GET /users/`
+
+    curl -H "Content-Type: application/json" http://localhost:3000/users
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 57
+
+    [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
+
+`GET /token/`
+
+    curl -H "Content-Type: application/json" http://localhost:3000/users
+
+### Response
+
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huIGRvZSIsImV4cCI6MTYzNDU1NzA5NSwiaWF0IjoxNjM0NTUzNDY1fQ==.7ce31f18e4a0f871fac40dc7e9a064899adfe1d05e14360187fb986c167e3d3e
+
+`POST /users/:id`
+
+    curl -d '{"title":"bloodborne","progress":"first bonfire"}' -H "Accept: application/json"
+    -H "Authorization: Bearer {token}" http://localhost:3000/users/:id
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 57
+
+    [{ id: 1, title: 'bloodborne', progess: 'first bonfire' }]
 
 ## Acknowledgements
 - Many thanks to Hahn!
