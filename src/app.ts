@@ -180,21 +180,5 @@ app.delete('/users/:userid/games/:gameid', (req: Request, res: Response) => {
   }
 });
 
-app.get('/protected', (req: Request, res: Response) => {
-  // resource protected by JWT
-  try {
-    const header = req.header('Authorization');
-    if (header) {
-      const token = header.replace('Bearer ', '');
-      if (verifySignature(token)) {
-        res.status(200);
-        res.send('secret information');
-      }
-    }
-  } catch {
-    res.send(500);
-  }
-});
-
 // Start server
 app.listen(port, () => console.log(`Server is listening on port ${port}!`));
