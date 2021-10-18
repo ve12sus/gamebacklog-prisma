@@ -57,6 +57,8 @@ The REST API to the example app is described below.
 
     [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
 
+## Get a list of users
+
 `GET /users/`
 
     curl -H "Content-Type: application/json" http://localhost:3000/users
@@ -71,6 +73,8 @@ The REST API to the example app is described below.
 
     [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
 
+## Get an authentication token
+
 `GET /token/`
 
     curl -H "Content-Type: application/json" http://localhost:3000/users
@@ -78,6 +82,8 @@ The REST API to the example app is described below.
 ### Response
 
     eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huIGRvZSIsImV4cCI6MTYzNDU1NzA5NSwiaWF0IjoxNjM0NTUzNDY1fQ==.7ce31f18e4a0f871fac40dc7e9a064899adfe1d05e14360187fb986c167e3d3e
+
+## Use the Token to create a backlog
 
 `POST /users/:id`
 
