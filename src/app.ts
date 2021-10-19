@@ -4,7 +4,7 @@ import express, {
 } from 'express';
 import passport from 'passport';
 import { BasicStrategy } from 'passport-http';
-import { signToken, verifySignature } from './jwt';
+import { signToken, decodeBasicHeader, verifySignature } from './jwt';
 
 const prisma = new PrismaClient();
 const app = express();
@@ -64,10 +64,12 @@ app.post('/users', (req: Request, res: Response) => {
 });
 
 app.get('/token', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
-  // returns a token
-  const email = req.get('Authorization')?.split(' ')[1].split(':')[0];
   try {
-    const webToken = signToken(email as string);
+    const email = decodeBasicHeader(req.get('Authorization') as string);
+    if (!email) {
+      throw new Error('Unexpected error: Missing Email');
+    }
+    const webToken = signToken(email);
     res.send(webToken); res.status(200);
   } catch {
     res.send(500);
@@ -107,7 +109,6 @@ app.get('/users/:id/games', (req: Request, res: Response) => {
 });
 
 app.post('/users/:id/games', (req: Request, res: Response) => {
-  // creates a game backlog
   try {
     const header = req.header('Authorization');
     if (header) {
@@ -132,7 +133,6 @@ app.post('/users/:id/games', (req: Request, res: Response) => {
 });
 
 app.put('/users/:userid/games/:gameid', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
-  // updates a game
   try {
     const header = req.header('Authorization');
     if (header) {
@@ -157,7 +157,6 @@ app.put('/users/:userid/games/:gameid', passport.authenticate('basic', { session
 });
 
 app.delete('/users/:userid/games/:gameid', (req: Request, res: Response) => {
-  // deletes a game from a user
   try {
     const header = req.header('Authorization');
     if (header) {
@@ -181,5 +180,4 @@ app.delete('/users/:userid/games/:gameid', (req: Request, res: Response) => {
   }
 });
 
-// Start server
 app.listen(port, () => console.log(`Server is listening on port ${port}!`));

@@ -1,5 +1,25 @@
 import { sha256 } from 'js-sha256';
 
+function unescape(str : string) {
+  return (str + '==='.slice((str.length + 3) % 4))
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+}
+
+function escape(str : string) {
+  return str.replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '');
+}
+
+function encode(str : string) {
+  return escape(Buffer.from(str, 'utf8').toString('base64'));
+}
+
+function decode(str : string) {
+  return Buffer.from(unescape(str), 'base64').toString('utf8');
+}
+
 export function signToken(user : string) : string {
   // loading private key
   const privateKey = 'myPrivateKey';
@@ -15,12 +35,25 @@ export function signToken(user : string) : string {
     iat: Math.floor(Date.now() / 1000) - 30,
   };
   // The signature is the header and the body base64URL encoded, SHA 256 hashed, signed with the key
-  const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64');
-  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64');
-  const headerAndPayload = `${encodedHeader.toString()}.${encodedPayload.toString()}`;
-  const signature = sha256.hmac(privateKey, headerAndPayload);
-  const token = `${encodedHeader.toString()}.${encodedPayload.toString()}.${signature}`;
+  const encodedHeader = encode(JSON.stringify(header));
+  const encodedPayload = encode(JSON.stringify(payload));
+  const headerAndPayload = `${encodedHeader}.${encodedPayload}`;
+  const signatureHex = sha256.hmac(privateKey, headerAndPayload);
+  const signature64url = escape(Buffer.from(signatureHex, 'hex').toString('base64'));
+  const token = `${headerAndPayload}.${signature64url}`;
   return token;
+}
+
+export function decodeBasicHeader(string : string) : string {
+  try {
+    const basicAuthDecoded = Buffer.from(string.split(' ')[1], 'base64');
+    const email = basicAuthDecoded.toString().split(':')[0];
+    if (!email) {
+      throw new Error('Unexpected error: Invalid JWT');
+    } return email;
+  } catch (err) {
+    throw new Error('Unexpected error: Invalid JWT');
+  }
 }
 
 export function decodeToken(token : string) : string {
