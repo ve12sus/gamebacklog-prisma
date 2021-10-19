@@ -21,20 +21,16 @@ function decode(str : string) {
 }
 
 export function signToken(user : string) : string {
-  // loading private key
   const privateKey = 'myPrivateKey';
-  // JWT header
   const header = {
     typ: 'JWT',
     alg: 'HS256',
   };
-  // JWT payload
   const payload = {
     sub: user,
     exp: Math.floor(Date.now() / 1000) + (60 * 60),
     iat: Math.floor(Date.now() / 1000) - 30,
   };
-  // The signature is the header and the body base64URL encoded, SHA 256 hashed, signed with the key
   const encodedHeader = encode(JSON.stringify(header));
   const encodedPayload = encode(JSON.stringify(payload));
   const headerAndPayload = `${encodedHeader}.${encodedPayload}`;
@@ -59,7 +55,6 @@ export function decodeBasicHeader(string : string) : string {
 export function decodeToken(token : string) : string {
   const header = token.split('.')[0];
   const decodedHeader = Buffer.from(header, 'base64');
-  console.log(decodedHeader.toString());
   return decodedHeader.toString();
 }
 
