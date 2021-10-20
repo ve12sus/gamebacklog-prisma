@@ -3,6 +3,10 @@ import chaiHttp from 'chai-http'
 
 chai.use(chaiHttp);
 
+const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9. \
+  eyJzdWIiOiJmb29AYmFyIiwiZXhwIjoxNjM0NzE2MjIwLCJpYXQiOjE2MzQ3MTI1OTB9. \
+  1yAmslzUoNOQlv02aNp24GskWIrOeJQznnBQrji7AbE'
+
 describe('Gamebacklog', function() {
   describe('GET /users', function() {
     it('should get users then respond with status 200', function() {
@@ -16,38 +20,11 @@ describe('Gamebacklog', function() {
         });
     });
   });
-  describe('GET /users/:id', function() {
-    it('should get an user then respond with status 200', function() {
-      chai.request('http://localhost:3000')
-        .get('/users/6079b55168d9ed021a15f350')
-        .auth('bar4', 'bar5')
-        .then(function (res) {
-          expect(res).to.have.status(200);
-        })
-        .catch(function (err) {
-          throw err;
-        });
-    });
-  });
-  describe('PUT /users/:id', function() {
-    it('should update user then respond with status 200', function() {
-      chai.request('http://localhost:3000')
-        .put('/users/6085be7544c13d02e8843f76')
-        .auth('bar4', 'bar5')
-        .send({"email":"jeff","password":"hunter5"})
-        .then(function (res) {
-          expect(res).to.have.status(200);
-        })
-        .catch(function (err) {
-          throw err;
-        });
-    });
-  });
   describe('POST /users/', function() {
     it('should create user then respond with status 200', function() {
       chai.request('http://localhost:3000')
         .post('/users')
-        .send({"email":"jeff1","password":"hunter6"})
+        .send({"name":"foo","email":"foo@bar","password":"bar"})
         .then(function (res) {
           expect(res).to.have.status(200);
         })
@@ -56,14 +33,26 @@ describe('Gamebacklog', function() {
         });
     });
   });
-  describe('DELETE /users/:id', function() {
-    it('should delete the user(notfound) then respond with status 500', function() {
+  describe('GET /users/:id', function() {
+    it('should get an user then respond with status 200', function() {
       chai.request('http://localhost:3000')
-        .delete('/users/wronguser')
-        .auth('bar4', 'bar5')
-        .send({"email":"jeff1","password":"hunter6"})
+        .get('/users/2')
+        .auth('foo@bar', 'bar')
         .then(function (res) {
-          expect(res).to.have.status(500);
+          expect(res).to.have.status(200);
+        })
+        .catch(function (err) {
+          throw err;
+        });
+    });
+  });
+  describe('GET /token', function() {
+    it('should obtain a JWT token', function() {
+      chai.request('http://localhost:3000')
+        .get('/token')
+        .auth('foo@bar', 'bar')
+        .then(function (res) {
+          expect(res).to.have.status(200);
         })
         .catch(function (err) {
           throw err;
@@ -73,9 +62,23 @@ describe('Gamebacklog', function() {
   describe('POST /users/:id/games/', function() {
     it('should create user backlog then respond with status 200', function() {
       chai.request('http://localhost:3000')
-        .post('/users/60956b72357d7d0272892beb/games')
-        .auth('bar4', 'bar5')
-        .send({"name":"bloodborne","progress":"first boss"})
+        .post('/users/2/games')
+        .set({ "Authorization": `Bearer ${token}` })
+        .send({"title":"bloodborne","progress":"first bonfire"})
+        .then(function (res) {
+          expect(res).to.have.status(200);
+        })
+        .catch(function (err) {
+          throw err;
+        });
+    });
+  });
+  describe('PUT /users/:id/games/:id', function() {
+    it('should update a backlog then respond with status 200', function() {
+      chai.request('http://localhost:3000')
+        .post('/users/2/games/1')
+        .set({ "Authorization": `Bearer ${token}` })
+        .send({"title":"bloodborne","progress":"first bonfire"})
         .then(function (res) {
           expect(res).to.have.status(200);
         })
@@ -85,10 +88,10 @@ describe('Gamebacklog', function() {
     });
   });
   describe('DELETE /users/:id/games/:id', function() {
-    it('should create user backlog then respond with status 200', function() {
+    it('should delete a backlog then respond with status 200', function() {
       chai.request('http://localhost:3000')
-        .delete('/users/60956b72357d7d0272892beb/games/60956faa357d7d0272892bf0')
-        .auth('bar4', 'bar5')
+        .delete('/users/2/games/1')
+        .set({ "Authorization": `Bearer ${token}` })
         .then(function (res) {
           expect(res).to.have.status(200);
         })
