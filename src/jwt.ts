@@ -62,10 +62,11 @@ export function verifySignature(token : string) : boolean {
   try {
     const header = token.split('.')[0];
     const payload = token.split('.')[1];
-    const sig = token.split('.')[2];
+    const signature = token.split('.')[2];
     const headerPayload = `${header}.${payload}`;
-    const recalculatedSig = sha256.hmac('myPrivateKey', headerPayload);
-    if (sig === recalculatedSig) {
+    const reCalculatedSignatureHex = sha256.hmac('myPrivateKey', headerPayload);
+    const reCalculatedsignature64url = escape(Buffer.from(reCalculatedSignatureHex, 'hex').toString('base64'));
+    if (signature === reCalculatedsignature64url) {
       return true;
     }
     return false;

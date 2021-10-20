@@ -91,7 +91,7 @@ app.get('/users/:id/games', (req: Request, res: Response) => {
   try {
     const header = req.header('Authorization');
     if (header) {
-      const token = header.replace('Bearer ', '');
+      const token = header.split(' ')[1];
       if (verifySignature(token)) {
         prisma.game.findMany({
           where: {
@@ -112,7 +112,7 @@ app.post('/users/:id/games', (req: Request, res: Response) => {
   try {
     const header = req.header('Authorization');
     if (header) {
-      const token = header.replace('Bearer ', '');
+      const token = header.split(' ')[1];
       if (verifySignature(token)) {
         const { title, progress } = req.body as Game;
         prisma.game.create({
@@ -125,25 +125,25 @@ app.post('/users/:id/games', (req: Request, res: Response) => {
           gameProgress => { res.json(gameProgress); res.status(200); },
           err => { console.log(err); res.status(500); },
         );
-      }
+      } throw new Error('an error occured');
     }
   } catch {
     res.send(500);
   }
 });
 
-app.put('/users/:userid/games/:gameid', passport.authenticate('basic', { session: false }), (req: Request, res: Response) => {
+app.put('/users/:userid/games/:gameid', (req: Request, res: Response) => {
   try {
     const header = req.header('Authorization');
     if (header) {
-      const token = header.replace('Bearer ', '');
+      const token = header.split(' ')[1];
       if (verifySignature(token)) {
         const { title, progress } = req.body as Game;
-        prisma.game.create({
+        prisma.game.update({
+          where: { id: parseInt(req.params.gameid, 10) },
           data: {
             title,
             progress,
-            author: { connect: { id: parseInt(req.params.id, 10) } },
           },
         }).then(
           gameProgress => { res.json(gameProgress); res.status(200); },
@@ -160,14 +160,13 @@ app.delete('/users/:userid/games/:gameid', (req: Request, res: Response) => {
   try {
     const header = req.header('Authorization');
     if (header) {
-      const token = header.replace('Bearer ', '');
+      const token = header.split(' ')[1];
       if (verifySignature(token)) {
-        const { title, progress } = req.body as Game;
-        prisma.game.create({
-          data: {
-            title,
-            progress,
-            author: { connect: { id: parseInt(req.params.id, 10) } },
+        prisma.game.delete({
+          where: { id: parseInt(req.params.id, 10) },
+          select: {
+            id: true,
+            title: true,
           },
         }).then(
           gameProgress => { res.json(gameProgress); res.status(200); },

@@ -32,7 +32,7 @@
 
 # REST API
 
-The REST API to the example app is described below.
+The REST API to the app is described below.
 
 ## Create a user
 
@@ -40,7 +40,8 @@ The REST API to the example app is described below.
 
 `POST /users/`
 
-    curl -d '{"name":"foo","email":"foo@bar","password":"bar"}' -H "Content-Type: application/json" http://localhost:3000/users
+    curl -H "Content-Type: application/json" -X POST http://localhost:3000/users
+    -d '{"name":"foo","email":"foo@bar","password":"bar"}' 
 
 ### Response
 
@@ -48,7 +49,6 @@ The REST API to the example app is described below.
     Status: 200 OK
     Connection: close
     Content-Type: application/json
-    Content-Length: 57
 
     [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
 
@@ -64,26 +64,15 @@ The REST API to the example app is described below.
     Status: 200 OK
     Connection: close
     Content-Type: application/json
-    Content-Length: 57
 
-    [{ id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
+    [{ id: 1, email: 'jeff@jeff.com', password: 'hunter2', name: 'jeff' },
+     { id: 2, email: 'foo@bar', password: 'bar', name: 'foo' }]
 
-## Get an authentication token
+## Get a single user by id of users
 
-`GET /token/`
+`GET /users/:id`
 
-    curl -H "Content-Type: application/json" http://localhost:3000/users
-
-### Response
-
-    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29AYmFyIiwiZXhwIjoxNjM0NjAwODE2LCJpYXQiOjE2MzQ1OTcxODZ9.74e4fc3122044966bbf64b2bb859872087f014615d39a0ce55a8057575caf054
-    
-## Use the Token to create a backlog
-
-`POST /users/:id`
-
-    curl -d '{"title":"bloodborne","progress":"first bonfire"}' -H "Accept: application/json"
-    -H "Authorization: Bearer {token}" http://localhost:3000/users/:id
+    curl -H "Authorization: Basic {foo@bar:bar}" http://localhost:3000/users/2
 
 ### Response
 
@@ -91,9 +80,109 @@ The REST API to the example app is described below.
     Status: 200 OK
     Connection: close
     Content-Type: application/json
-    Content-Length: 57
 
-    [{ id: 1, title: 'bloodborne', progess: 'first bonfire' }]
+    [{ "id": 2, "email": "foo@bar", "password": "bar", "name": "foo"}]
+
+## Get an authentication token
+
+`GET /token/`
+
+    curl -H "Authorization: Basic {foo@bar:bar}" http://localhost:3000/token
+
+### Response
+
+    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmb29AYmFyIiwiZXhwIjoxNjM0NjAwODE2LCJpYXQiOjE2MzQ1OTcxODZ9.74e4fc3122044966bbf64b2bb859872087f014615d39a0ce55a8057575caf054
+    
+## Use the Token to create a backlog
+
+`POST /users/:id/games`
+
+    curl -H "Accept: application/json" -H "Authorization: Bearer {token}" 
+    -d '{"title":"bloodborne","progress":"first bonfire"}' -X POST http://localhost:3000/users/2/games
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+
+    [{
+    "id": 1,
+    "createdAt": "2021-10-20T07:06:10.198Z",
+    "updatedAt": "2021-10-20T07:06:10.199Z",
+    "title": "bloodborne",
+    "progress": "first bonfire",
+    "authorId": 2
+    }]
+
+## Get a list of a user's backlog games
+
+`GET /users/:id/games`
+
+    curl -H "Accept: application/json" -H "Authorization: Bearer {token}" http://localhost:3000/users/2/games
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+
+    [{
+    "id": 1,
+    "createdAt": "2021-10-20T07:06:10.198Z",
+    "updatedAt": "2021-10-20T07:06:10.199Z",
+    "title": "bloodborne",
+    "progress": "first bonfire",
+    "authorId": 2
+    }]
+
+## Update a backlog
+
+`PUT /users/:id/games/:id`
+
+    curl -H "Accept: application/json" -H "Authorization: Bearer {token}" 
+    -d {"title";"bloodborne","progress":"completed"} -X PUT http://localhost:3000/users/2/games/1
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+
+    [{
+    "id": 1,
+    "createdAt": "2021-10-20T07:06:10.198Z",
+    "updatedAt": "2021-10-20T07:06:10.199Z",
+    "title": "bloodborne",
+    "progress": "completed",
+    "authorId": 2
+    }]
+
+## Delete a backlog
+
+`PUT /users/:id/games/:id`
+
+    curl -H "Accept: application/json" -H "Authorization: Bearer {token}" 
+    -X DELETE http://localhost:3000/users/2/games/1
+
+### Response
+
+    HTTP/1.1 200 OK
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+
+    [{
+    "id": 1,
+    "createdAt": "2021-10-20T07:06:10.198Z",
+    "updatedAt": "2021-10-20T07:06:10.199Z",
+    "title": "bloodborne",
+    "progress": "completed",
+    "authorId": 2
+    }]
 
 ## Acknowledgements
 - Many thanks to Hahn!
