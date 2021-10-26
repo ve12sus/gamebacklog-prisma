@@ -29,7 +29,6 @@ provider "aws" {
   profile = "default"
 }
 
-# Fetch AZs in the current region
 data "aws_availability_zones" "available" {
 }
 
@@ -46,7 +45,6 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 }
 
-# Create var.az_count private subnets, each in a different AZ
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.default.id
   count             = var.az_count
@@ -97,8 +95,6 @@ resource "aws_route_table_association" "private" {
   route_table_id = element(aws_route_table.private.*.id, count.index)
 }
 
-# security.tf
-
 # ALB Security Group: Edit to restrict access to the application
 resource "aws_security_group" "lb" {
   name        = "gbl-load-balancer-security-group"
@@ -140,8 +136,6 @@ resource "aws_security_group" "ecs_tasks" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# alb.tf
 
 resource "aws_alb" "main" {
   name            = "gbl-load-balancer"
@@ -219,7 +213,6 @@ resource "aws_ecs_task_definition" "gbl_api" {
   network_mode = "awsvpc"
 }
 
-# ecs.tf
 resource "aws_ecs_service" "main" {
   name            = "gbl-service"
   task_definition = aws_ecs_task_definition.gbl_api.arn
@@ -244,8 +237,6 @@ resource "aws_ecs_service" "main" {
 resource "aws_cloudwatch_log_group" "gbl_api" {
   name = "/ecs/gbl-api"
 }
-
-
 
 resource "aws_iam_role" "gbl_api_task_execution_role" {
   name               = "gbl-api-task-execution-role"
@@ -274,8 +265,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   role       = aws_iam_role.gbl_api_task_execution_role.name
   policy_arn = data.aws_iam_policy.ecs_task_execution_role.arn
 }
-
-# logs.tf
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "gbl_log_group" {
