@@ -223,10 +223,6 @@ resource "aws_ecs_service" "main" {
   depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_role]
 }
 
-resource "aws_cloudwatch_log_group" "gbl_api" {
-  name = "/ecs/gbl-api"
-}
-
 resource "aws_iam_role" "gbl_api_task_execution_role" {
   name               = "gbl-api-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role.json
@@ -257,7 +253,7 @@ resource "aws_cloudwatch_log_group" "gbl_log_group" {
   retention_in_days = 30
 
   tags = {
-    Name = "gbk-log-group"
+    Name = "gbl-log-group"
   }
 }
 
