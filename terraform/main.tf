@@ -261,3 +261,7 @@ resource "aws_cloudwatch_log_stream" "cb_log_stream" {
   name           = "cb-log-stream"
   log_group_name = aws_cloudwatch_log_group.gbl_log_group.name
 }
+
+output "alb_url" {
+  value = "http://${aws_alb.main.dns_name}"
+}
